@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eae9df">
+  <meta name="description" content="Nordveil gives growing engineering teams one clear view of infrastructure health, dependencies, and incidents.">
+  <title>Nordveil — Know the shape of every incident</title>
+  <style>
+    :root {
+      --paper: #eae9df;
+      --paper-light: #f5f3e9;
+      --ink: #17251e;
+      --forest: #203a2c;
+      --forest-light: #2a4936;
+      --muted: #67756b;
+      --line: #c8cabe;
+      --rust: #ca6546;
+      --lime: #d5e184;
+      --white: #f8f7ef;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Arial, Helvetica, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    svg { display: block; }
+    .frame { width: min(1300px, calc(100% - 88px)); margin-inline: auto; }
+    .eyebrow { color: var(--forest); font: 10px var(--mono); letter-spacing: .15em; text-transform: uppercase; }
+    .topline { height: 5px; background: var(--forest); position: relative; }
+    .topline::after { content: ""; position: absolute; right: 0; top: 0; width: 15%; height: 5px; background: var(--rust); }
+
+    /* The header uses a narrow right column that continues through the hero. */
+    .nav { min-height: 78px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; position: relative; z-index: 20; }
+    .brand { display: inline-flex; width: max-content; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; letter-spacing: -.075em; }
+    .brand-mark { width: 25px; height: 25px; display: grid; place-items: center; background: var(--forest); color: var(--lime); font: 15px var(--mono); position: relative; }
+    .brand-mark::after { content: ""; position: absolute; width: 5px; height: 5px; background: var(--rust); right: -3px; top: -3px; }
+    .nav-links { display: flex; gap: 34px; align-items: center; color: #536157; font-size: 12px; }
+    .nav-links a { transition: color .2s, transform .2s; }
+    .nav-links a:hover { color: var(--rust); transform: translateY(-2px); }
+    .nav-action { justify-self: end; display: inline-flex; align-items: center; gap: 25px; padding: 13px 15px; border: 1px solid var(--forest); font: 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; transition: background .22s, color .22s, gap .22s; }
+    .nav-action:hover { color: var(--white); background: var(--forest); gap: 34px; }
+    .nav-action span { font: 19px var(--sans); line-height: 8px; color: var(--rust); }
+    .menu-button { display: none; border: 0; background: transparent; color: var(--ink); font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 12px 0; cursor: pointer; }
+
+    .hero { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(32px, 5vw, 75px); padding-block: 77px 83px; align-items: center; }
+    .hero-copy { min-width: 0; }
+    .hero .eyebrow { display: flex; align-items: center; gap: 11px; }
+    .hero .eyebrow::before { content: ""; width: 27px; height: 1px; background: var(--rust); }
+    h1 { font-size: clamp(68px, 8.25vw, 124px); letter-spacing: -.105em; line-height: .82; font-weight: 600; margin: 27px 0 30px; }
+    h1 em { display: inline-block; color: var(--forest); font: italic 400 .94em var(--serif); letter-spacing: -.1em; }
+    .hero-sub { color: #58675b; max-width: 430px; font-size: 15px; line-height: 1.75; margin: 0 0 29px; }
+    .hero-cta { display: inline-flex; align-items: center; gap: 31px; background: var(--forest); color: var(--white); padding: 17px 18px; font: 10px var(--mono); letter-spacing: .075em; text-transform: uppercase; transition: background .22s, gap .22s; }
+    .hero-cta:hover { background: var(--rust); gap: 45px; }
+    .hero-cta span { color: var(--lime); font: 21px var(--sans); line-height: 10px; }
+    .hero-footnote { color: #899186; font: 9px var(--mono); letter-spacing: .04em; margin: 17px 0 0; }
+
+    .hero-visual { min-width: 0; position: relative; padding: 0 0 13px 13px; }
+    .visual-coordinate { position: absolute; top: -16px; right: 0; color: #899287; font: 9px var(--mono); letter-spacing: .1em; }
+    .console { height: 500px; border: 1px solid var(--forest); background: #17271e; color: var(--white); position: relative; overflow: hidden; box-shadow: -13px 13px 0 #d2d5c5; }
+    .console-bar { height: 47px; padding-inline: 16px; border-bottom: 1px solid #3a5440; display: flex; justify-content: space-between; align-items: center; color: #adc0a8; font: 9px var(--mono); letter-spacing: .09em; }
+    .console-bar b { color: var(--lime); font-weight: 400; }
+    .console-grid { position: absolute; inset: 47px 0 42px; background-image: linear-gradient(#a3c29b13 1px, transparent 1px), linear-gradient(90deg, #a3c29b13 1px, transparent 1px); background-size: 37px 37px; }
+    .console-grid::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 53% 45%, transparent 0 20%, #17271e55 80%); }
+    .topology { position: absolute; inset: 63px 13px 64px; width: calc(100% - 26px); height: calc(100% - 127px); overflow: visible; }
+    .wire { fill: none; stroke: #6d856e; stroke-width: 1.3; stroke-dasharray: 4 6; animation: wire-flow 22s linear infinite; }
+    .wire.primary { stroke: var(--lime); stroke-width: 2; stroke-dasharray: none; filter: drop-shadow(0 0 4px #d5e18480); }
+    .wire.affected { stroke: var(--rust); stroke-width: 2.2; stroke-dasharray: none; opacity: 0; transition: opacity .35s; }
+    .node { fill: #17271e; stroke: #9bb29b; stroke-width: 1.8; }
+    .node.center { stroke: var(--lime); stroke-width: 2; }
+    .node.problem { stroke: var(--lime); transition: stroke .35s, filter .35s; }
+    .node-core { fill: var(--lime); }
+    .map-text { fill: #b1beac; font: 9px var(--mono); letter-spacing: .04em; }
+    .map-text.problem-text { fill: #b1beac; transition: fill .35s; }
+    .crosshair { position: absolute; width: 27px; height: 27px; left: 56.4%; top: 44.2%; border: 1px solid var(--lime); border-radius: 50%; opacity: .65; pointer-events: none; }
+    .crosshair::before, .crosshair::after { content: ""; position: absolute; background: var(--lime); }
+    .crosshair::before { width: 37px; height: 1px; top: 12px; left: -6px; }
+    .crosshair::after { height: 37px; width: 1px; left: 12px; top: -6px; }
+    .metric { position: absolute; z-index: 2; padding: 9px 11px; background: #1e3225; border: 1px solid #5d775e; }
+    .metric small { display: block; color: #a0b39d; font: 8px var(--mono); letter-spacing: .08em; }
+    .metric strong { display: block; color: var(--lime); font: 18px var(--mono); margin-top: 5px; }
+    .metric-left { top: 72px; left: 17px; }
+    .metric-right { right: 17px; bottom: 63px; }
+    .incident-note { position: absolute; right: 17px; top: 85px; z-index: 2; padding: 8px 10px; border-left: 2px solid var(--rust); background: #302e23; color: #e5a48c; font: 8px var(--mono); letter-spacing: .04em; opacity: 0; transform: translateX(8px); transition: opacity .3s, transform .3s; }
+    .console-bottom { position: absolute; inset: auto 0 0; height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 13px; border-top: 1px solid #3a5440; background: #132119; font: 8px var(--mono); letter-spacing: .07em; color: #889b86; }
+    .state-switch { display: flex; align-items: center; gap: 3px; padding: 3px; border: 1px solid #567058; }
+    .state-switch button { border: 0; background: transparent; color: #8aa089; padding: 5px 8px; cursor: pointer; font: 8px var(--mono); letter-spacing: .05em; transition: background .2s, color .2s; }
+    .state-switch button[aria-pressed="true"] { color: var(--ink); background: var(--lime); }
+    .state-switch button:hover:not([aria-pressed="true"]) { color: var(--white); background: #2c4632; }
+    .console[data-state="incident"] .wire.affected { opacity: 1; }
+    .console[data-state="incident"] .node.problem { stroke: var(--rust); filter: drop-shadow(0 0 7px var(--rust)); }
+    .console[data-state="incident"] .map-text.problem-text { fill: #e6a087; }
+    .console[data-state="incident"] .incident-note { opacity: 1; transform: translateX(0); }
+    .console[data-state="incident"] .metric-right strong { color: #e5a48c; }
+    @keyframes wire-flow { to { stroke-dashoffset: -140; } }
+
+    .proof { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 26px 0 27px; display: grid; grid-template-columns: 1fr 3fr; align-items: center; gap: 30px; }
+    .proof-label { color: #778279; font: 9px/1.65 var(--mono); letter-spacing: .11em; text-transform: uppercase; }
+    .logo-strip { display: flex; justify-content: space-between; align-items: center; gap: 22px; color: #455347; }
+    .logo-strip span { white-space: nowrap; font-size: 17px; font-weight: 700; letter-spacing: -.05em; }
+    .logo-strip span:nth-child(2) { font: italic 20px var(--serif); }
+    .logo-strip span:nth-child(3) { font: 12px var(--mono); letter-spacing: .14em; }
+    .logo-strip span:nth-child(4) { font-weight: 400; letter-spacing: -.08em; font-size: 20px; }
+    .logo-strip span:nth-child(5) { font: 13px var(--mono); }
+
+    .section { padding-block: 118px; }
+    .section-heading { display: grid; grid-template-columns: 1.25fr .75fr; align-items: end; gap: 48px; margin-bottom: 55px; }
+    .section-heading h2 { font-size: clamp(48px, 6vw, 79px); font-weight: 600; line-height: .91; letter-spacing: -.09em; margin: 19px 0 0; }
+    .section-heading h2 em { font: italic 400 1em var(--serif); color: var(--forest); letter-spacing: -.1em; }
+    .section-heading p { max-width: 360px; color: #6b776d; font-size: 13px; line-height: 1.77; margin: 0 0 3px; }
+    .features { background: var(--paper-light); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .feature-list { border-top: 1px solid var(--line); }
+    .feature { display: grid; grid-template-columns: 66px 56px 1.2fr 1.6fr 24px; gap: 22px; align-items: center; padding: 28px 8px; border-bottom: 1px solid var(--line); transition: background .22s, padding .22s; }
+    .feature:hover { background: #e9ecdf; padding-left: 20px; padding-right: 20px; }
+    .feature-no { color: #849084; font: 10px var(--mono); }
+    .feature-icon { width: 46px; height: 46px; border: 1px solid #b9c3b7; display: grid; place-items: center; color: var(--forest); transition: background .22s, transform .22s; }
+    .feature:hover .feature-icon { background: var(--lime); transform: rotate(-8deg); }
+    .feature-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
+    .feature h3 { font: 400 28px var(--serif); letter-spacing: -.045em; margin: 0; }
+    .feature p { color: #657267; max-width: 360px; font-size: 12px; line-height: 1.7; margin: 0; }
+    .feature-arrow { color: var(--rust); font-size: 19px; transition: transform .22s; }
+    .feature:hover .feature-arrow { transform: translate(4px, -4px); }
+
+    .method { background: var(--forest); color: var(--white); position: relative; overflow: hidden; }
+    .method::before { content: ""; position: absolute; right: -125px; top: -130px; width: 590px; height: 590px; border: 1px solid #58715755; border-radius: 50%; box-shadow: 0 0 0 62px var(--forest), 0 0 0 63px #58715755, 0 0 0 125px var(--forest), 0 0 0 126px #58715755; pointer-events: none; }
+    .method-inner { position: relative; display: grid; grid-template-columns: .83fr 1.17fr; gap: 90px; }
+    .method .eyebrow { color: var(--lime); }
+    .method h2 { font-size: clamp(48px, 5.4vw, 73px); line-height: .92; letter-spacing: -.09em; font-weight: 600; margin: 19px 0 22px; }
+    .method-intro p { max-width: 340px; color: #bbcabc; font-size: 13px; line-height: 1.78; }
+    .method-stamp { margin-top: 55px; border: 1px solid #6b846d; width: 146px; height: 64px; display: grid; place-items: center; transform: rotate(-7deg); color: var(--lime); font: 9px/1.7 var(--mono); letter-spacing: .09em; text-align: center; }
+    .steps { border-top: 1px solid #6b846d; }
+    .step { display: grid; grid-template-columns: 38px 1fr auto; gap: 20px; padding: 27px 0; border-bottom: 1px solid #6b846d; }
+    .step-no { color: var(--lime); font: 10px var(--mono); padding-top: 5px; }
+    .step h3 { font: 400 25px var(--serif); margin: 0 0 8px; letter-spacing: -.04em; }
+    .step p { color: #bfccbd; font-size: 12px; line-height: 1.7; margin: 0; max-width: 410px; }
+    .step-tag { color: #a4baa6; font: 8px var(--mono); letter-spacing: .08em; padding-top: 7px; }
+
+    .pricing { padding-block: 118px 126px; }
+    .pricing .section-heading { margin-bottom: 54px; }
+    .price-list { border-top: 1px solid #aeb8aa; }
+    .price-row { display: grid; grid-template-columns: .8fr 1.15fr 1.35fr 1.25fr .75fr; align-items: center; gap: 20px; padding: 26px 10px; border-bottom: 1px solid #aeb8aa; transition: background .22s, padding .22s; }
+    .price-row:hover { background: #dfe4d4; padding-left: 22px; padding-right: 22px; }
+    .price-row.recommended { background: #dce4ce; }
+    .price-row.recommended:hover { background: #d0dfba; }
+    .tier { color: #687767; font: 9px var(--mono); letter-spacing: .09em; }
+    .price { white-space: nowrap; font: 29px var(--serif); letter-spacing: -.05em; }
+    .price small { color: #748075; font: 9px var(--mono); letter-spacing: 0; }
+    .price-desc { max-width: 220px; color: #5e6c60; font-size: 11px; line-height: 1.65; }
+    .price-includes { color: #607362; font: 9px/2 var(--mono); }
+    .price-includes b { color: #6d8c50; font-weight: 400; padding-right: 4px; }
+    .price-link { justify-self: end; color: var(--forest); font: 9px var(--mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; transition: color .2s, transform .2s; }
+    .price-link span { color: var(--rust); font: 18px var(--sans); margin-left: 7px; }
+    .price-link:hover { color: var(--rust); transform: translateX(5px); }
+
+    footer { background: var(--ink); color: var(--paper); padding: 32px 0 23px; }
+    .footer-inner { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px; align-items: center; }
+    .footer-note { color: #8b9e8d; text-align: center; font: 8px var(--mono); letter-spacing: .1em; }
+    .footer-links { display: flex; justify-content: end; gap: 22px; color: #bcc7ba; font-size: 10px; }
+    .footer-links a { transition: color .2s; }
+    .footer-links a:hover { color: var(--lime); }
+    .footer-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; border-top: 1px solid #435047; padding-top: 16px; margin-top: 9px; color: #7f9181; font: 8px var(--mono); letter-spacing: .07em; }
+
+    @media (max-width: 1000px) {
+      .frame { width: calc(100% - 60px); }
+      .hero { gap: 31px; }
+      .console { height: 440px; }
+      .feature { grid-template-columns: 42px 48px 1fr 1.3fr 20px; gap: 14px; }
+      .feature h3 { font-size: 24px; }
+      .method-inner { gap: 48px; }
+      .price-row { gap: 13px; }
+      .pricing .frame { width: calc(100% - 48px); }
+    }
+    @media (max-width: 700px) {
+      .frame, .pricing .frame { width: calc(100% - 40px); }
+      .nav { min-height: 68px; grid-template-columns: 1fr auto; }
+      .menu-button { display: block; justify-self: end; }
+      .nav-links { display: none; position: absolute; top: 67px; left: -20px; right: -20px; background: var(--paper-light); border-bottom: 1px solid var(--line); padding: 13px 20px 22px; flex-direction: column; align-items: stretch; gap: 0; }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 14px 0; border-bottom: 1px solid var(--line); }
+      .nav-action { display: none; }
+      .hero { grid-template-columns: 1fr; padding-block: 58px 68px; gap: 44px; }
+      h1 { font-size: clamp(66px, 17vw, 105px); margin: 24px 0 26px; }
+      .hero-sub { font-size: 14px; }
+      .console { height: min(105vw, 480px); min-height: 365px; box-shadow: -7px 7px 0 #d2d5c5; }
+      .visual-coordinate { font-size: 8px; top: -14px; }
+      .topology { inset: 62px 9px 62px; width: calc(100% - 18px); height: calc(100% - 124px); }
+      .console-bar { padding-inline: 11px; font-size: 8px; }
+      .metric-left { left: 10px; top: 62px; }
+      .metric-right { right: 10px; bottom: 59px; }
+      .incident-note { right: 9px; top: 84px; font-size: 7px; }
+      .console-bottom { padding-inline: 7px; font-size: 7px; }
+      .proof { grid-template-columns: 1fr; gap: 13px; padding-block: 21px; }
+      .logo-strip { justify-content: start; gap: 16px 24px; flex-wrap: wrap; }
+      .logo-strip span { font-size: 14px; }
+      .logo-strip span:nth-child(2) { font-size: 17px; }
+      .logo-strip span:nth-child(3) { font-size: 10px; }
+      .logo-strip span:nth-child(4) { font-size: 17px; }
+      .logo-strip span:nth-child(5) { font-size: 11px; }
+      .section, .pricing { padding-block: 79px; }
+      .section-heading { grid-template-columns: 1fr; gap: 20px; margin-bottom: 35px; }
+      .section-heading h2 { font-size: clamp(47px, 12vw, 67px); }
+      .feature { grid-template-columns: 30px 40px 1fr 17px; gap: 12px; padding: 20px 3px; align-items: start; }
+      .feature:hover { padding-left: 10px; padding-right: 8px; }
+      .feature-icon { width: 38px; height: 38px; }
+      .feature h3 { grid-column: 3; grid-row: 1; font-size: 22px; padding-top: 1px; }
+      .feature-no { padding-top: 5px; }
+      .feature p { grid-column: 3 / 5; grid-row: 2; font-size: 11px; }
+      .feature-arrow { grid-column: 4; grid-row: 1; }
+      .method-inner { grid-template-columns: 1fr; gap: 38px; }
+      .method h2 { font-size: clamp(50px, 12vw, 68px); }
+      .method-stamp { margin-top: 28px; width: 120px; height: 54px; }
+      .step { grid-template-columns: 30px 1fr; gap: 10px; padding: 21px 0; }
+      .step h3 { font-size: 21px; }
+      .step-tag { grid-column: 2; padding-top: 0; }
+      .price-row { grid-template-columns: 1fr auto; gap: 8px 12px; padding: 20px 4px; }
+      .price-row:hover { padding-left: 10px; padding-right: 8px; }
+      .price-row.recommended { padding-inline: 10px; }
+      .tier { grid-column: 1; grid-row: 1; }
+      .price { grid-column: 2; grid-row: 1; text-align: right; font-size: 25px; }
+      .price small { font-size: 8px; }
+      .price-desc { grid-column: 1 / 3; grid-row: 2; max-width: none; }
+      .price-includes { grid-column: 1; grid-row: 3; font-size: 8px; }
+      .price-link { grid-column: 2; grid-row: 3; font-size: 8px; }
+      .footer-inner { grid-template-columns: 1fr; gap: 23px; }
+      .footer-note { display: none; }
+      .footer-links { justify-content: start; }
+      .footer-bottom { gap: 15px; }
+    }
+    @media (max-width: 380px) { .console-bottom > span { display: none; } .hero-visual { padding-left: 7px; } .price { font-size: 21px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body id="top">
+  <div class="topline" aria-hidden="true"></div>
+  <header class="frame">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Nordveil home"><span class="brand-mark">N</span>nordveil</a>
+      <div class="nav-links" id="nav-links"><a href="#platform">Platform</a><a href="#method">How it works</a><a href="#pricing">Pricing</a></div>
+      <a class="nav-action" href="mailto:hello@nordveil.example?subject=Nordveil%20walkthrough">Talk to our team <span>↗</span></a>
+      <button class="menu-button" type="button" aria-controls="nav-links" aria-expanded="false">Menu +</button>
+    </nav>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow">Infrastructure, in perspective</div>
+        <h1 id="hero-title">Know the<br><em>whole story.</em></h1>
+        <p class="hero-sub">From the first odd signal to the service behind it, Nordveil gives your team one clear view of production. Find what changed, understand the impact, and move before a small issue becomes a long night.</p>
+        <a class="hero-cta" href="mailto:hello@nordveil.example?subject=See%20Nordveil%20in%20action">See Nordveil in action <span>↗</span></a>
+        <p class="hero-footnote">A focused 20-minute walkthrough for your engineering team.</p>
+      </div>
+      <div class="hero-visual">
+        <span class="visual-coordinate">FIG. 01 / A LIVE SYSTEM, MADE LEGIBLE</span>
+        <div class="console" data-state="healthy" aria-label="Interactive infrastructure service map">
+          <div class="console-bar"><span>PRODUCTION / SERVICE TOPOLOGY</span><b id="system-status">● SYSTEM HEALTHY</b></div>
+          <div class="console-grid" aria-hidden="true"></div>
+          <div class="metric metric-left"><small>ACTIVE SERVICES</small><strong>24 / 24</strong></div>
+          <div class="incident-note">P95 LATENCY SHIFT · CACHE</div>
+          <svg class="topology" viewBox="0 0 620 360" role="img" aria-label="Connected services from edge to worker and cache">
+            <path class="wire" d="M27 183 139 96 245 150 350 69 459 125 589 70M27 183 141 277 245 150 352 261 459 125 578 274M139 96 141 277M350 69 352 261M459 125 578 274"/>
+            <path class="wire primary" d="M27 183 139 96 245 150 350 69 459 125 589 70"/>
+            <path class="wire affected" d="M459 125 578 274"/>
+            <circle class="node" cx="27" cy="183" r="6"/><circle class="node" cx="139" cy="96" r="6"/><circle class="node center" cx="245" cy="150" r="8"/><circle class="node-core" cx="245" cy="150" r="2.6"/><circle class="node" cx="350" cy="69" r="6"/><circle class="node" cx="459" cy="125" r="7"/><circle class="node" cx="589" cy="70" r="5"/><circle class="node" cx="141" cy="277" r="5"/><circle class="node" cx="352" cy="261" r="5"/><circle class="node problem" cx="578" cy="274" r="7"/>
+            <text class="map-text" x="12" y="206">EDGE</text><text class="map-text" x="105" y="76">AUTH</text><text class="map-text" x="212" y="128">CHECKOUT</text><text class="map-text" x="325" y="48">PAYMENTS</text><text class="map-text" x="439" y="105">QUEUE</text><text class="map-text" x="546" y="52">WORKER</text><text class="map-text" x="106" y="299">IDENTITY DB</text><text class="map-text" x="323" y="284">EVENT BUS</text><text class="map-text problem-text" x="539" y="300">CACHE</text>
+          </svg>
+          <div class="crosshair" aria-hidden="true"></div>
+          <div class="metric metric-right"><small id="latency-label">TRACE P95</small><strong id="latency-value">142 ms</strong></div>
+          <div class="console-bottom"><span>REGION / EU-WEST-1</span><div class="state-switch" role="group" aria-label="View system state"><button type="button" data-view="healthy" aria-pressed="true">NORMAL</button><button type="button" data-view="incident" aria-pressed="false">INCIDENT</button></div><span>SYNC / 02 SEC AGO</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="proof" aria-label="Illustrative customer logo bar"><div class="proof-label">For teams that keep<br>production moving.</div><div class="logo-strip"><span>northstar</span><span>Lattice</span><span>KINETIQ</span><span>relay.</span><span>/ COMMONS</span></div></section>
+  </header>
+  <main>
+    <section class="features section" id="platform"><div class="frame"><div class="section-heading"><div><div class="eyebrow">One connected view</div><h2>Less searching.<br><em>More knowing.</em></h2></div><p>Infrastructure rarely fails in one neat place. Nordveil keeps the connections visible, so the next useful question is always within reach.</p></div><div class="feature-list">
+      <article class="feature"><span class="feature-no">01 / MAP</span><div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="20" cy="11" r="2"/><circle cx="12" cy="20" r="2"/><path d="M6 11l4-5m4 0 4 4M6 13l4 6m4 0 5-6"/></svg></div><h3>See every dependency</h3><p>A living map connects services, infrastructure, and owners, giving your team a shared understanding of what relies on what.</p><span class="feature-arrow">↗</span></article>
+      <article class="feature"><span class="feature-no">02 / TRACE</span><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M2 17h4l3-8 4 6 3-4h6"/><circle cx="19" cy="11" r="2"/></svg></div><h3>Follow the change</h3><p>Move from an unusual metric to the trace, log, and deployment behind it without losing the thread.</p><span class="feature-arrow">↗</span></article>
+      <article class="feature"><span class="feature-no">03 / ACT</span><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2 2 20h20L12 2Z"/><path d="M12 8v5m0 3h.01"/></svg></div><h3>Respond with context</h3><p>Alerts point to user impact and the likely cause, so on-call engineers spend less time reconstructing the situation.</p><span class="feature-arrow">↗</span></article>
+    </div></div></section>
+    <section class="method section" id="method"><div class="frame method-inner"><div class="method-intro"><div class="eyebrow">How it works</div><h2>From first<br>signal to fix.</h2><p>Get a useful view quickly, then let Nordveil build a richer picture as your environment changes.</p><div class="method-stamp">CONNECT · CORRELATE<br>RESOLVE / REPEAT</div></div><div class="steps"><article class="step"><span class="step-no">01</span><div><h3>Connect your signals</h3><p>Bring metrics, logs, traces, and cloud services together with lightweight integrations.</p></div><span class="step-tag">COLLECT</span></article><article class="step"><span class="step-no">02</span><div><h3>Map the relationships</h3><p>Nordveil connects dependencies, owners, and recent changes into one live system view.</p></div><span class="step-tag">UNDERSTAND</span></article><article class="step"><span class="step-no">03</span><div><h3>Give everyone the trail</h3><p>Share the same incident context across engineering, from the first alert through resolution.</p></div><span class="step-tag">RESPOND</span></article></div></div></section>
+    <section class="pricing" id="pricing"><div class="frame"><div class="section-heading"><div><div class="eyebrow">Clear plans, clear systems</div><h2>Find your<br><em>operating range.</em></h2></div><p>Every tier includes the complete workspace and unlimited teammates. Choose the depth of history and support your systems need.</p></div><div class="price-list"><div class="price-row"><div class="tier">01 / CORE</div><div class="price">$29 <small>/ host / mo</small></div><div class="price-desc">For a team bringing its first services into focus.</div><div class="price-includes"><b>+</b> 30-day retention<br><b>+</b> Core integrations</div><a class="price-link" href="mailto:hello@nordveil.example?subject=Nordveil%20Core%20plan">Explore Core <span>↗</span></a></div><div class="price-row recommended"><div class="tier">02 / TEAM · RECOMMENDED</div><div class="price">$49 <small>/ host / mo</small></div><div class="price-desc">For growing systems and a busy on-call rotation.</div><div class="price-includes"><b>+</b> 90-day retention<br><b>+</b> Advanced correlation</div><a class="price-link" href="mailto:hello@nordveil.example?subject=Nordveil%20Team%20plan">Explore Team <span>↗</span></a></div><div class="price-row"><div class="tier">03 / SCALE</div><div class="price">Let's talk</div><div class="price-desc">For complex environments and specific needs.</div><div class="price-includes"><b>+</b> Flexible retention<br><b>+</b> Dedicated support</div><a class="price-link" href="mailto:hello@nordveil.example?subject=Nordveil%20Scale%20plan">Talk to us <span>↗</span></a></div></div></div></section>
+  </main>
+  <footer><div class="frame footer-inner"><a class="brand" href="#top"><span class="brand-mark">N</span>nordveil</a><div class="footer-note">A CLEARER VIEW OF WHAT KEEPS YOU MOVING.</div><nav class="footer-links" aria-label="Footer navigation"><a href="#platform">Platform</a><a href="#pricing">Pricing</a><a href="mailto:hello@nordveil.example">Contact</a></nav><div class="footer-bottom"><span>© 2026 NORDVEIL SYSTEMS</span><span>MADE FOR THE PEOPLE ON CALL.</span></div></div></footer>
+  <script>
+    const menuButton = document.querySelector('.menu-button');
+    const navLinks = document.querySelector('.nav-links');
+    menuButton.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuButton.textContent = open ? 'Close −' : 'Menu +';
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      menuButton.setAttribute('aria-expanded', 'false');
+      menuButton.textContent = 'Menu +';
+    }));
+
+    const consoleView = document.querySelector('.console');
+    const viewButtons = document.querySelectorAll('[data-view]');
+    viewButtons.forEach(button => button.addEventListener('click', () => {
+      const incident = button.dataset.view === 'incident';
+      consoleView.dataset.state = button.dataset.view;
+      viewButtons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      document.querySelector('#system-status').textContent = incident ? '● INVESTIGATING SIGNAL' : '● SYSTEM HEALTHY';
+      document.querySelector('#latency-value').textContent = incident ? '408 ms' : '142 ms';
+    }));
+  </script>
+</body>
+</html>
